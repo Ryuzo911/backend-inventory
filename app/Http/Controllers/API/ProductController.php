@@ -7,6 +7,8 @@ use App\Http\Requests\StoreProductRequest;
 use App\Http\Requests\UpdateProductRequest;
 use App\Models\Product;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 
 class ProductController extends Controller
 {
@@ -23,7 +25,19 @@ class ProductController extends Controller
      */
     public function store(StoreProductRequest $request)
     {   
-        Product::create($request->validated());
+        \Log::info($request->all());
+        \Log::info($request->file('image'));
+            
+        $validated = $request->validated();
+
+        if ($request->hasFile('image')) {
+            $path = $request->file('image')->store('product', 'public');
+            $validated["image_url"] = url(Storage::url($path));
+        }
+
+        $product = Product::create($validated);
+
+        return response()->json($product->load('category'), 201);
     }
 
     /**
@@ -31,7 +45,7 @@ class ProductController extends Controller
      */
     public function show(Product $product)
     {
-        //
+        return $product;
     }
 
     /**
@@ -39,7 +53,28 @@ class ProductController extends Controller
      */
     public function update(UpdateProductRequest $request, Product $product)
     {
-        $product->update($request->validated());
+        \Log::info('Update Request All', $request->all());
+        \Log::info('hasImage? ', ['has' => $request->hasFile('image')]);
+
+         $validated = $request->validated();
+
+         if ($request->hasFile('image')) {
+             $file = $request->file('image');
+
+             // optional: delete old image
+             if ($product->image_url) {
+                 $publicPath = str_replace('/storage/', '', parse_url($product->image_url, PHP_URL_PATH));
+                 if (Storage::disk('public')->exists($publicPath)) {
+                     Storage::disk('public')->delete($publicPath);
+                 }
+             }
+         
+             $path = $file->store('product', 'public');
+             $validated['image_url'] = url(Storage::url($path));
+         }
+
+             $product->update($validated);
+             return response()->json($product->load('category'), 200);
     }
 
     /**

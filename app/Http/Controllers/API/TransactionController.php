@@ -7,6 +7,7 @@ use App\Http\Requests\StoreTransactionRequest;
 use App\Http\Requests\UpdateTransactionRequest;
 use App\Models\Product;
 use App\Models\Transaction;
+use Illuminate\Support\Facades\DB;
 
 class TransactionController extends Controller
 {
@@ -15,7 +16,13 @@ class TransactionController extends Controller
      */
     public function index()
     {
-        return Transaction::get();
+        $sort = request()->get('sort', 'desc');
+        $transaction = Transaction::with(['product', 'user',])
+            ->orderBy('created_at', $sort)
+            ->paginate(20);
+            
+
+        return response()->json($transaction);
     }
 
     /**
@@ -31,17 +38,48 @@ class TransactionController extends Controller
      */
     public function store(StoreTransactionRequest $request)
     {
-       $transaction = Transaction::create($request->only(['product_id', 'type', 'quantity', 'created_by']));
+       $userId = auth()->id();
 
-        $product =  Product::find($request->input('product_id'));
-        if($request->input('type') === 'in'){
-            $product->stock += $request->input('quantity');
-        } else {
-            $product->stock -= $request->input('quantity');
+       return DB::transaction(function () use ($request, $userId) {
+        $data = $request->only([
+            'product_id',
+            'type',
+            'quantity',
+        ]);
+
+        $product = Product::lockForUpdate()->findOrFail($data['product_id']);
+
+        $prevStock = $product->stock;
+        $qty = $data['quantity'];
+
+        if ($data['type'] === 'out' && $qty > $prevStock) {
+            return response()->json([
+                'message' => 'Insufficient stock for this transaction.',
+                'error' => ['quantity' => 'Insufficient stock available.']
+            ], 422);
         }
 
+        $newStock = $data['type'] === 'in' ? $prevStock + $qty : $prevStock - $qty;
+
+        $product->stock = $newStock;
         $product->save();
-        return response()->json(['message' => 'transaksi ditambahkan', 'data' => $transaction]);
+
+        $transaction = Transaction::create([
+            'product_id' => $data['product_id'],
+            'type' => $data['type'],
+            'quantity' => $data['quantity'],
+            'created_by' => $userId,
+            'prev_stock' => $prevStock,
+            'new_stock' => $newStock,
+            'note' => $data['note'] ?? null,
+        ]);
+        $transaction->load('product', 'user');
+
+        return response()->json([
+            'message' => 'Transaction created successfully.',
+            'data' => $transaction
+        ], 201);
+       });
     }
 
     /**
@@ -49,7 +87,7 @@ class TransactionController extends Controller
      */
     public function show(Transaction $transaction)
     {
-        //
+        return $transaction;
     }
 
     /**

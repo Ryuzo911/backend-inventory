@@ -24,6 +24,9 @@ class UpdateProductRequest extends FormRequest
         return [
             "name" => "required|string",
             "stock" => "required|integer",
+            "category_id" => "nullable|exists:categories,id",
+            // The image_url field is optional in the update request
+            "image_url" => "nullable|image|mimes:jpg,jpeg,png,svg|max:2048",
         ];
     }
 
@@ -32,6 +35,8 @@ class UpdateProductRequest extends FormRequest
         return [
             'name.required' => 'A name is required',
             'stock.required'=> 'A stock is required',
+            'category_id.exists' => 'Category not found',
+            'image_url.url' => 'Image URL must be a valid URL',
         ];
     }
 }

@@ -15,5 +15,19 @@ class Transaction extends Model
         "type",
         "quantity",
         "created_by",
+        "prev_stock",
+        "new_stock",
+        "note",
     ];
+
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'created_by');
+    }
+    
+    public function product()
+    {
+        return $this->belongsTo(Product::class);
+    }
+
 }

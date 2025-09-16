@@ -25,7 +25,8 @@ class StoreTransactionRequest extends FormRequest
         "product_id" => "required|exists:products,id",
         "type" => "required|in:in,out",
         "quantity" => "required|integer|min:1",
-        "created_by" => "required|exists:users,id",
+        // "created_by" => "required|exists:users,id",
+        "note" => "nullable|string|max:255",
         ];
     }
 

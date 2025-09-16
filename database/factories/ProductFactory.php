@@ -20,7 +20,8 @@ class ProductFactory extends Factory
         return [
             'name' => $this->faker->word(),
             'category_id' => fake()->randomElement(Category::pluck('id')->toArray()),
-            'stock' => $this->faker->numberBetween(1, 100)            
+            'stock' => $this->faker->numberBetween(1, 100),       
+            'image_url' => $this->faker->imageUrl(640, 480, 'food', true),
         ];
     }
 }

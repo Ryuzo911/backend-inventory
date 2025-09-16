@@ -12,10 +12,15 @@ class Product extends Model
         "name",
         "category_id",
         "stock",
-
+        "image_url"
     ];
 
     public function category(){
         return $this->belongsTo(Category::class);
+    }
+
+    public function transactions()
+    {
+        return $this->hasMany(Transaction::class);
     }
 }

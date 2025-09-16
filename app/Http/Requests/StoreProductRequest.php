@@ -25,6 +25,7 @@ class StoreProductRequest extends FormRequest
             "name" => "required|string",
             "category_id" => "required|exists:categories,id",
             "stock" => "required|integer",
+            "image_url" => "nullable|image|mimes:jpg,jpeg,png,svg|max:2048",
         ];
     }
 
@@ -35,6 +36,7 @@ class StoreProductRequest extends FormRequest
             'category_id.required' => 'A category is required',
             'stock.required'=> 'A stock is required',
             'category_id.exists' => 'Category not found',
+            'image_url.url' => 'Image URL must be a valid URL',
         ];
     }
 
