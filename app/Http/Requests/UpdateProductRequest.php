@@ -25,7 +25,6 @@ class UpdateProductRequest extends FormRequest
             "name" => "required|string",
             "stock" => "required|integer",
             "category_id" => "nullable|exists:categories,id",
-            // The image_url field is optional in the update request
             "image_url" => "nullable|image|mimes:jpg,jpeg,png,svg|max:2048",
         ];
     }

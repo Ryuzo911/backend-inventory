@@ -8,12 +8,20 @@ use Illuminate\Auth\Access\Response;
 
 class TransactionPolicy
 {
+
+    public function before(User $user, string $ability)
+    {
+        if ($user->isAdmin()) {
+            return true;
+        }
+        return null;
+    }
     /**
      * Determine whether the user can view any models.
      */
     public function viewAny(User $user): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -21,7 +29,7 @@ class TransactionPolicy
      */
     public function view(User $user, Transaction $transaction): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -29,7 +37,7 @@ class TransactionPolicy
      */
     public function create(User $user): bool
     {
-        return false;
+        return $user->role === 'user';
     }
 
     /**

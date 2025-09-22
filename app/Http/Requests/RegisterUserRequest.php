@@ -19,13 +19,20 @@ class RegisterUserRequest extends FormRequest
      *
      * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
      */
+
+    public function prepareForValidation(): void
+    {
+        $this->merge([
+            'role' => $this->input('role', 'user'), // Default role is 'user' if not provided
+        ]);
+    }
     public function rules(): array
     {
         return [
             "name"=> "required|string",
             "email"=> "required|email|",
             "password"=> "required|min:6|max:255",
-            "role"=> "required|in:admin,user,owner",
+            // "role"=> "required|in:admin,user,owner",
 
         ];
     }
@@ -39,8 +46,8 @@ class RegisterUserRequest extends FormRequest
             'password.required' => 'Password is required',
             'password.min' => 'Password is minimum 6 characters',
             'password.max' => 'Password is maximum 255 characters',
-            'role.required' => 'Role is required',
-            'role.in' => 'Role is invalid',
+            // 'role.required' => 'Role is required',
+            // 'role.in' => 'Role is invalid',
 
         ];
     }
