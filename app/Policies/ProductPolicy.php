@@ -11,6 +11,8 @@ class ProductPolicy
 
     public function before(User $user, string $ability)
     {
+        // dd($user->role, $user->isAdmin());
+
         if ($user->isAdmin()) {
             return true;
         }

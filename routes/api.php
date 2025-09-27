@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\API\AuthController;
 use App\Http\Controllers\API\CategoryController;
+use App\Http\Controllers\API\PermissionController;
 use App\Http\Controllers\API\ProductController;
 use App\Http\Controllers\API\TransactionController; 
 use Illuminate\Http\Request;
@@ -9,6 +10,8 @@ use Illuminate\Support\Facades\Route;
 
 Route::middleware('auth:sanctum')->group(function(){
     
+    // Auth Routes
+    Route::get('/user/permissions', [PermissionController::class, 'index']);
     Route::get('/user', [AuthController::class, 'user']);
     Route::post('/change-password', [AuthController::class, 'changePassword']);
     Route::post('/logout', [AuthController::class, 'logout']);
@@ -23,7 +26,7 @@ Route::middleware('auth:sanctum')->group(function(){
     // Category Routes with Authorization
     Route::get('/category', [CategoryController::class, 'index'])->middleware('can:viewAny, App\Models\Category');
     Route::post('/category', [CategoryController::class, 'store'])->middleware('can:create, App\Models\Category');
-    Route::get('/category/{category', [CategoryController::class, 'show'])->middleware('can:view, category');
+    Route::get('/category/{category}', [CategoryController::class, 'show'])->middleware('can:view, category');
     Route::put('/category/{category}', [CategoryController::class, 'update'])->middleware('can:update, category');
     Route::delete('/category/{category}', [CategoryController::class, 'destroy'])->middleware('can:delete, category');
 
@@ -31,6 +34,6 @@ Route::middleware('auth:sanctum')->group(function(){
     Route::get('/transaction', [TransactionController::class, 'index'])->middleware('can:viewAny, App\Models\Transaction');
     Route::post('/transaction', [TransactionController::class, 'store'])->middleware('can:create, App\Models\Transaction');
 });
-
-Route::post('/register', [AuthController::class,'register']);
-Route::post('login', [AuthController::class,'login']);
+    // Auth Routes
+    Route::post('/register', [AuthController::class,'register']);
+    Route::post('login', [AuthController::class,'login']);
