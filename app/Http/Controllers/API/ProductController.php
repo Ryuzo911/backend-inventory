@@ -46,6 +46,7 @@ class ProductController extends Controller
      */
     public function show(Request $request, Product $product)
     {
+        $this->authorize('view', $product);
         return response()->json($product);
     }
 

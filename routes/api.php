@@ -19,7 +19,7 @@ Route::middleware('auth:sanctum')->group(function(){
     // Product Routes with Authorization
     Route::get('/product', [ProductController::class, 'index'])->middleware('can:viewAny, App\Models\Product');
     Route::post('/product', [ProductController::class, 'store'])->middleware('can:create, App\Models\Product');
-    Route::get('/product/{product}', [ProductController::class, 'show'])->middleware('can:view, product');
+    Route::get('/product/{product}', [ProductController::class, 'show']);
     Route::put('/product/{product}', [ProductController::class, 'update'])->middleware('can:update, product');
     Route::delete('/product/{product}', [ProductController::class, 'destroy'])->middleware('can:delete, product');
 
