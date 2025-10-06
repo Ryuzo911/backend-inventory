@@ -19,7 +19,7 @@ class PermissionController extends Controller
             'permissions' => [
                 'manage_product' => $user->can('create', Product::class),
                 'manage_category' => $user->can('create', Category::class),
-                'manage_transaction' => $user->can('create', Transaction::class) 
+                'manage_transaction' => $user->can('create', Transaction::class),
             ]
         ]);
     }
