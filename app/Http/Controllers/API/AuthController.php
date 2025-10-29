@@ -11,6 +11,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth as FacadesAuth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
+use Illuminate\Validation\Rule;
 
 class AuthController extends Controller
 {
@@ -57,8 +58,18 @@ class AuthController extends Controller
 
        $validatedData = $request->validate([
         "name" => 'nullable|string|max:255',
-        "email" => 'nullable|email|unique:users,email,$user->id',
+        "email" => [
+            'nullable',
+            'email',
+            Rule::unique('users','email')->ignore($user->id),
+        ],
+        "role" => 'nullable|string|max:50',
        ]);
+
+       if (isset($validatedData['role']) && ! $request->user()->hasRole('admin')) {
+           abort(403, 'Unauthorized to change role.');
+       }
+
        $user->update($validatedData);
        return new UserResource($user);
     }
@@ -84,6 +95,17 @@ class AuthController extends Controller
 
         return response()->json([
             'message' => 'Password berhasil diubah.'
+        ]);
+    }
+
+    public function deleteAccount(Request $request)
+    {
+        $user = $request->user();
+        $user->tokens()->delete();
+        $user->delete();
+
+        return response()->json([
+            'message' => 'Akun berhasil dihapus.'
         ]);
     }
 

@@ -26,9 +26,6 @@ class ProductController extends Controller
      */
     public function store(StoreProductRequest $request)
     {   
-        \Log::info($request->all());
-        \Log::info($request->file('image'));
-            
         $validated = $request->validated();
 
         if ($request->hasFile('image')) {
@@ -55,8 +52,6 @@ class ProductController extends Controller
      */
     public function update(UpdateProductRequest $request, Product $product)
     {
-        \Log::info('Update Request All', $request->all());
-        \Log::info('hasImage? ', ['has' => $request->hasFile('image')]);
 
          $validated = $request->validated();
 

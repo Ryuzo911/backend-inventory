@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\API\AdminUserController;
 use App\Http\Controllers\API\AuthController;
 use App\Http\Controllers\API\CategoryController;
 use App\Http\Controllers\API\PermissionController;
@@ -15,6 +16,11 @@ Route::middleware('auth:sanctum')->group(function(){
     Route::get('/user', [AuthController::class, 'user']);
     Route::post('/change-password', [AuthController::class, 'changePassword']);
     Route::post('/logout', [AuthController::class, 'logout']);
+
+    //Manage Users (Admin Only)
+    Route::middleware('admin')->prefix('admin')->group(function () {
+        Route::apiResource('users', AdminUserController::class)->only(['index', 'store', 'update', 'destroy']);
+    });
 
     // Product Routes with Authorization
     Route::get('/product', [ProductController::class, 'index'])->middleware('can:viewAny, App\Models\Product');
